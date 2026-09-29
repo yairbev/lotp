@@ -1,0 +1,29 @@
+title: Repository automation change followed by developer process and network activity
+id: lotp-developer-automation-v1
+status: experimental
+scope: joined Git and endpoint telemetry
+description: Detects a change to executable development configuration followed by local execution and a new destination.
+window: 60m
+join_keys:
+  - repository
+  - commit
+sequence:
+  - event_kind: git.change
+    changed_path_matches:
+      - dev/**
+      - scripts/**
+      - Makefile
+      - package.json
+      - .devcontainer/**
+      - .vscode/tasks.json
+  - event_kind: runtime.process
+    process_origin: repository-controlled
+  - event_kind: network.connection
+    destination_allowed: false
+severity: high
+triage:
+  - Verify the developer explicitly invoked the repository task.
+  - Inspect the changed automation and its transitive scripts or dependencies.
+  - Identify other developers who pulled the commit and ran the same task.
+  - Preserve process-tree and network evidence before endpoint cleanup.
+

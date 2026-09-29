@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Normalized CI/CD contamination event",
+  "type": "object",
+  "required": ["timestamp", "event_kind", "scenario_id", "repository"],
+  "properties": {
+    "timestamp": {"type": "string", "format": "date-time"},
+    "event_kind": {
+      "enum": ["git.authentication", "git.change", "ci.run", "runtime.process", "network.connection", "artifact.created"]
+    },
+    "scenario_id": {"type": "string", "pattern": "^NJ-[A-Z]+-[0-9]{2}$"},
+    "repository": {"type": "string"},
+    "actor": {"type": "string"},
+    "commit": {"type": "string"},
+    "workflow_path": {"type": "string"},
+    "run_id": {"type": "string"},
+    "runner_id": {"type": "string"},
+    "process": {"type": "string"},
+    "parent_process": {"type": "string"},
+    "destination": {"type": "string"},
+    "artifact_digest": {"type": "string"},
+    "secret_context_used": {"type": "boolean"},
+    "data_classification": {"const": "lab-demo"}
+  },
+  "additionalProperties": true
+}

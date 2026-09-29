@@ -1,0 +1,91 @@
+# Public repository allowlist
+#
+# Ignore every top-level item first. The exceptions below are the complete
+# public package: one presentation, the runnable lab, and its attendee guides.
+/*
+
+# Repository and lab entry points
+!/.dockerignore
+!/.env.example
+!/.gitattributes
+!/.gitignore
+!/README.md
+!/WALKTHROUGH.md
+!/compose.yaml
+
+# Runnable lab implementation
+!/config/
+!/demo/
+!/docker/
+!/scripts/
+!/walkthroughs/
+
+# Defensive material that accompanies the lab
+!/observability/
+
+# Publish only lab-facing documentation
+!/docs/
+/docs/*
+!/docs/ARCHITECTURE.md
+!/docs/BUILD-STATUS.md
+!/docs/DEMO-RUNBOOK.md
+!/docs/SAFETY.md
+!/docs/SOURCES.md
+!/docs/TROUBLESHOOTING.md
+
+# Publish only the current presentation
+!/slides/
+/slides/*
+!/slides/Living-Off-the-Pipeline-Light-Editorial-Draft-03.pptx
+
+# Optional future PoC recordings; keep supporting build material excluded
+!/recordings/
+/recordings/*
+!/recordings/*.mp4
+!/recordings/*.webm
+!/recordings/*.mov
+!/recordings/*.mkv
+
+# Never publish generated state, caches, secrets, or private key material,
+# including files created below an allowed lab directory.
+**/.env
+**/.env.*
+!/.env.example
+**/.runtime/
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.coverage*
+**/htmlcov/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.tox/
+**/.nox/
+**/.venv/
+**/venv/
+**/node_modules/
+**/*.key
+**/*.pem
+**/*.p12
+**/*.pfx
+**/*.jks
+**/id_rsa
+**/id_rsa.*
+**/id_ed25519
+**/id_ed25519.*
+**/credentials.json
+**/kubeconfig
+**/*.tfstate
+**/*.tfstate.*
+**/*.log
+**/events.jsonl
+**/deployment.json
+**/~$*
+**/.DS_Store
+**/Thumbs.db
+**/Desktop.ini
+
+# Explicit guard for the unrelated dummy SMB file-share project
+/DummyFileShare/
+/dummy_file_share/
+/build_dummy_file_share.py

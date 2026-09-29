@@ -1,0 +1,142 @@
+name: living-off-pipeline
+
+services:
+  gitea:
+    image: docker.io/gitea/gitea:${GITEA_VERSION:-1.26.4}-rootless
+    container_name: lotp-gitea
+    restart: unless-stopped
+    environment:
+      GITEA__database__DB_TYPE: sqlite3
+      GITEA__database__PATH: /var/lib/gitea/data/gitea/gitea.db
+      GITEA__server__DOMAIN: localhost
+      GITEA__server__ROOT_URL: http://localhost:3000/
+      GITEA__server__HTTP_PORT: "3000"
+      GITEA__server__DISABLE_SSH: "true"
+      GITEA__security__INSTALL_LOCK: "true"
+      GITEA__security__MIN_PASSWORD_LENGTH: "12"
+      GITEA__actions__ENABLED: "true"
+      GITEA__actions__DEFAULT_ACTIONS_URL: self
+      GITEA__metrics__ENABLED: "true"
+      GITEA__log__MODE: console
+      GITEA__log__LEVEL: info
+      GITEA_RUNNER_REGISTRATION_TOKEN: ${GITEA_RUNNER_REGISTRATION_TOKEN}
+    ports:
+      - "${LAB_BIND_ADDRESS:-127.0.0.1}:3000:3000"
+    volumes:
+      - gitea-data:/var/lib/gitea
+      - gitea-config:/etc/gitea
+    networks:
+      - lab
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/api/healthz"]
+      interval: 3s
+      timeout: 2s
+      retries: 60
+
+  runner:
+    build:
+      context: .
+      dockerfile: docker/runner/Dockerfile
+      args:
+        GITEA_RUNNER_VERSION: ${GITEA_RUNNER_VERSION:-1.0.0}
+    container_name: lotp-runner
+    restart: unless-stopped
+    environment:
+      CONFIG_FILE: /config.yaml
+      GITEA_INSTANCE_URL: http://gitea:3000/
+      GITEA_RUNNER_REGISTRATION_TOKEN: ${GITEA_RUNNER_REGISTRATION_TOKEN}
+      GITEA_RUNNER_NAME: ${GITEA_RUNNER_NAME:-nightjar-runner}
+      GITEA_RUNNER_LABELS: ${GITEA_RUNNER_LABELS:-nightjar:host}
+      LAB_RELEASE_ROOT: /srv/releases
+      COLLECTOR_URL: http://collector:9000
+    volumes:
+      - ./config/runner-config.yaml:/config.yaml:ro
+      - runner-data:/data
+      - releases:/srv/releases
+    networks:
+      - lab
+    depends_on:
+      gitea:
+        condition: service_healthy
+        restart: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  prod-app:
+    build:
+      context: .
+      dockerfile: demo/prod/Dockerfile
+    container_name: lotp-prod-app
+    restart: unless-stopped
+    environment:
+      RELEASE_ROOT: /srv/releases
+      RUNTIME_ROOT: /srv/runtime
+      COLLECTOR_DATA_PATH: /data/events.jsonl
+      COLLECTOR_RESET_TOKEN: ${COLLECTOR_RESET_TOKEN:-local-reset-only}
+      DEMO_PORTAL_USER: ${DEMO_PORTAL_USER:-demo.user}
+      DEMO_PORTAL_PASSWORD: ${DEMO_PORTAL_PASSWORD:-DemoPortal-Only-2026!}
+      DEMO_JWT_SECRET: ${DEMO_JWT_SECRET:-LAB_ONLY_JWT_SIGNING_VALUE}
+      DEMO_DB_PASSWORD: ${DEMO_DB_PASSWORD:-LAB_ONLY_DATABASE_PASSWORD}
+      DEMO_KEY_CANARY_PATH: /opt/lab/canaries/demo-key-canary.txt
+    ports:
+      - "${LAB_BIND_ADDRESS:-127.0.0.1}:8000:8000"
+      - "${LAB_BIND_ADDRESS:-127.0.0.1}:9000:9000"
+    volumes:
+      - releases:/srv/releases:ro
+      - prod-data:/data
+    networks:
+      lab:
+        aliases:
+          - collector
+          - prod-app
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /srv/runtime:uid=10001,gid=10001,mode=0750
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:9000/healthz', timeout=2)"]
+      interval: 3s
+      timeout: 2s
+      retries: 40
+
+  developer:
+    build:
+      context: .
+      dockerfile: demo/developer/Dockerfile
+    container_name: lotp-developer
+    restart: unless-stopped
+    environment:
+      GITEA_URL: http://gitea:3000
+      COLLECTOR_URL: http://collector:9000
+      DEMO_DEVELOPER_CANARY: ${DEMO_DEVELOPER_CANARY:-LAB_ONLY_DEVELOPER_CANARY}
+    volumes:
+      - developer-home:/home/developer
+    networks:
+      - lab
+    depends_on:
+      gitea:
+        condition: service_healthy
+        restart: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+networks:
+  lab:
+    name: lotp_lab
+    driver: bridge
+
+volumes:
+  gitea-data:
+  gitea-config:
+  runner-data:
+  releases:
+  prod-data:
+  developer-home:

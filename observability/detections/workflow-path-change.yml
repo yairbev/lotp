@@ -1,0 +1,30 @@
+title: Security-sensitive CI workflow changed without independent review
+id: lotp-workflow-path-change-v1
+status: experimental
+scope: normalized source-control audit events
+description: Detects direct changes to executable pipeline configuration on a protected branch.
+required_fields:
+  - timestamp
+  - actor
+  - repository
+  - commit
+  - changed_paths
+  - target_branch
+  - review_count
+logic:
+  all:
+    - target_branch_in: [main, master, release]
+    - changed_path_matches:
+        - .gitea/workflows/**
+        - .github/workflows/**
+        - Jenkinsfile
+        - .gitlab-ci.yml
+    - review_count_less_than: 1
+severity: high
+triage:
+  - Confirm whether the actor used a bypass or force-push right.
+  - Inspect the full diff for new secret references, external actions, shell steps, and egress destinations.
+  - Bind the commit to queued and completed runs before deciding containment.
+false_positives:
+  - Authorized emergency change with documented independent approval outside the Git platform.
+

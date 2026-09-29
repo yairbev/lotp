@@ -1,0 +1,22 @@
+# Docker builds use the project root as their context. Start by excluding
+# everything, then admit only files copied by the three lab Dockerfiles.
+**
+
+!docker/
+!docker/runner/
+!docker/runner/Dockerfile
+
+!demo/
+!demo/developer/
+!demo/developer/Dockerfile
+!demo/developer/entrypoint.sh
+
+!demo/prod/
+!demo/prod/Dockerfile
+!demo/prod/requirements.txt
+!demo/prod/collector.py
+!demo/prod/supervisor.py
+
+!demo/repository/
+!demo/repository/requirements.txt
+!demo/repository/requirements-dev.txt

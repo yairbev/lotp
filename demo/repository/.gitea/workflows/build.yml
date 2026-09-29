@@ -1,0 +1,45 @@
+name: Build and deploy Customer Account Portal
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: nightjar
+    steps:
+      - name: Check out the triggering commit
+        run: |
+          rm -rf source
+          git clone "http://gitea:3000/$GITHUB_REPOSITORY.git" source
+          cd source
+          git checkout "$GITHUB_SHA"
+
+      - name: Run readable tests
+        working-directory: source
+        run: |
+          python -m compileall -q app tools dev
+          PYTHONPATH="$PWD" python -m pytest -q
+
+      - name: Package the release
+        run: |
+          set -eu
+          staging="$LAB_RELEASE_ROOT/.staging/$GITHUB_SHA"
+          release="$LAB_RELEASE_ROOT/releases/$GITHUB_SHA"
+          rm -rf "$staging"
+          mkdir -p "$staging" "$LAB_RELEASE_ROOT/releases"
+          printf '{"commit":"%s","run_id":"%s"}\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" > source/release.json
+          tar --sort=name --mtime='UTC 2026-01-01' --owner=0 --group=0 -czf "$staging/release.tar.gz" -C source app requirements.txt release.json
+          sha256sum "$staging/release.tar.gz" > "$staging/release.sha256"
+          rm -rf "$release"
+          mv "$staging" "$release"
+
+      - name: Deploy the completed release
+        run: |
+          set -eu
+          printf '%s\n' "$GITHUB_SHA" > "$LAB_RELEASE_ROOT/current.tmp"
+          mv "$LAB_RELEASE_ROOT/current.tmp" "$LAB_RELEASE_ROOT/current"
+          echo "Deployed commit $GITHUB_SHA from pipeline run $GITHUB_RUN_ID"
