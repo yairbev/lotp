@@ -5,9 +5,12 @@ This advanced scenario shows trust moving back toward a developer. Pulling the c
 ## Clean starting state
 
 ```bash
+project_root="/opt/lotp"
+cd "$project_root"
 bash scripts/reset-lab.sh
-source scripts/common.sh
-initialize_environment
+cd "$HOME/lotp-lab/nightjar"
+git pull --ff-only origin main
+git status --short
 ```
 
 Confirm the event viewer is empty. Confirm the clean task inside the isolated developer container:
@@ -26,15 +29,16 @@ The repository controls `dev/bootstrap.py`. The isolated developer container con
 ## Make and inspect the change
 
 ```bash
-cp demo/scenarios/developer-targeting/dev/bootstrap.py \
-  "$SEED_WORKTREE/dev/bootstrap.py"
+cp "$project_root/demo/scenarios/developer-targeting/dev/bootstrap.py" \
+  dev/bootstrap.py
 
-seed_git diff -- dev/bootstrap.py
-seed_git add dev/bootstrap.py
-seed_git commit -m "demo: change the developer bootstrap [NJ-DEV-03]"
-auth_header="$(basic_auth_header)"
-seed_git -c "http.extraHeader=Authorization: Basic $auth_header" push origin main
+git diff -- dev/bootstrap.py
+git add dev/bootstrap.py
+git commit -m "demo: change the developer bootstrap [NJ-DEV-03]"
+git push origin main
 ```
+
+When Git prompts, use the lab account `demo-admin` and the `GITEA_ADMIN_PASSWORD` value from `$project_root/.env`.
 
 The push also starts the normal pipeline, but this scenario’s effect does not depend on that job.
 
@@ -76,6 +80,7 @@ Ask: which development tasks run repository code, which developers invoked the a
 ## Reset
 
 ```bash
+cd "$project_root"
 bash scripts/reset-lab.sh
 ```
 

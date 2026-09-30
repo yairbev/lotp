@@ -25,15 +25,25 @@ The Gitea username is `demo-admin`; the password is the `GITEA_ADMIN_PASSWORD` v
 
 The scenario examples under `demo/scenarios/` are readable replacement files. Each walkthrough has you copy one file into the seed worktree, inspect the Git diff, commit it, and push it. There is intentionally no script that performs a complete scenario.
 
-The commands use the project’s Git helper so the exact `.runtime/seed-worktree` path is trusted only for that command. At the beginning of each terminal session, load the helpers:
+The `.runtime/seed-worktree` directory belongs to the lab’s provisioning and reset automation. Do not use it for scenario work. Before Scenario 1, clone the Gitea repository into a separate working directory:
 
 ```bash
-cd /opt/presentation
-source scripts/common.sh
-initialize_environment
+mkdir -p "$HOME/lotp-lab"
+cd "$HOME/lotp-lab"
+git clone http://127.0.0.1:3000/demo-admin/nightjar.git
+cd nightjar
+git config user.name "Nightjar Demo Developer"
+git config user.email "developer@example.invalid"
 ```
 
-If you copied the project elsewhere, use that path instead of `/opt/presentation`.
+All scenario changes, commits, and pushes are performed from `$HOME/lotp-lab/nightjar` with the normal Git CLI. The scenario examples are copied from `/opt/lotp/demo/scenarios/`; adjust that project path if the lab repository is installed elsewhere.
+
+After `reset-lab.sh` restores Gitea, update the external clone before beginning the next scenario:
+
+```bash
+cd "$HOME/lotp-lab/nightjar"
+git pull --ff-only origin main
+```
 
 ## Recommended order
 

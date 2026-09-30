@@ -5,9 +5,12 @@ This advanced scenario shows one deployed application change producing two effec
 ## Clean starting state
 
 ```bash
+project_root="/opt/lotp"
+cd "$project_root"
 bash scripts/reset-lab.sh
-source scripts/common.sh
-initialize_environment
+cd "$HOME/lotp-lab/nightjar"
+git pull --ff-only origin main
+git status --short
 ```
 
 Wait for the clean Actions run to finish if reset created a commit. Confirm the portal signs in normally and the event viewer is empty.
@@ -21,10 +24,10 @@ The deployed application receives only three designated lab values: a demo JWT v
 ## Make and inspect the change
 
 ```bash
-cp demo/scenarios/application-contamination/app/main.py \
-  "$SEED_WORKTREE/app/main.py"
+cp "$project_root/demo/scenarios/application-contamination/app/main.py" \
+  app/main.py
 
-seed_git diff -- app/main.py
+git diff -- app/main.py
 ```
 
 The added login-handler logic posts two structured events to the local receiver. It is disabled during the pipeline tests and becomes active only when the code is running as a deployed release.
@@ -32,11 +35,12 @@ The added login-handler logic posts two structured events to the local receiver.
 Commit and push:
 
 ```bash
-seed_git add app/main.py
-seed_git commit -m "demo: contaminate the deployed portal [NJ-APP-02]"
-auth_header="$(basic_auth_header)"
-seed_git -c "http.extraHeader=Authorization: Basic $auth_header" push origin main
+git add app/main.py
+git commit -m "demo: contaminate the deployed portal [NJ-APP-02]"
+git push origin main
 ```
+
+When Git prompts, use the lab account `demo-admin` and the `GITEA_ADMIN_PASSWORD` value from `$project_root/.env`.
 
 ## Trigger and expected result
 
@@ -68,6 +72,7 @@ Ask: which application identity was used, which configuration values were reacha
 ## Reset
 
 ```bash
+cd "$project_root"
 bash scripts/reset-lab.sh
 ```
 

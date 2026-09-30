@@ -14,6 +14,12 @@ require_command base64
 [[ -d "$SEED_WORKTREE/.git" ]] || fail "Seed worktree not found. Run scripts/start-lab.sh first."
 assert_runtime_target "$SEED_WORKTREE"
 
+info "Synchronizing the internal reset worktree with Gitea"
+auth_header="$(basic_auth_header)"
+seed_git -c "http.extraHeader=Authorization: Basic $auth_header" fetch origin main
+seed_git reset --hard origin/main >/dev/null
+seed_git clean -fdx >/dev/null
+
 info "Restoring the tracked repository to the clean baseline template"
 seed_git rm -r --ignore-unmatch . >/dev/null 2>&1 || true
 seed_git clean -fdx >/dev/null
@@ -21,7 +27,6 @@ cp -a "$PROJECT_ROOT/demo/repository/." "$SEED_WORKTREE/"
 seed_git add -A
 if ! seed_git diff --cached --quiet; then
   seed_git commit -m "reset: restore clean baseline [NJ-BASE-01]" >/dev/null
-  auth_header="$(basic_auth_header)"
   seed_git -c "http.extraHeader=Authorization: Basic $auth_header" push origin main
 else
   info "Repository is already at the clean baseline"

@@ -7,10 +7,19 @@ This is the main live demonstration. It shows a repository workflow change causi
 From the project root:
 
 ```bash
+project_root="/opt/lotp"
+cd "$project_root"
 bash scripts/reset-lab.sh
-source scripts/common.sh
-initialize_environment
+
+mkdir -p "$HOME/lotp-lab"
+cd "$HOME/lotp-lab"
+git clone http://127.0.0.1:3000/demo-admin/nightjar.git
+cd nightjar
+git config user.name "Nightjar Demo Developer"
+git config user.email "developer@example.invalid"
 ```
+
+If the clone already exists from an earlier attempt, skip `git clone`, change to `$HOME/lotp-lab/nightjar`, and run `git pull --ff-only origin main`.
 
 Confirm the latest Actions run is green, the portal is available, and the event viewer says **No events recorded**.
 
@@ -23,10 +32,10 @@ The repository controls the workflow instruction. Gitea supplies `DEMO_BUILD_SEC
 Replace the clean workflow with the prepared, readable example:
 
 ```bash
-cp demo/scenarios/build-poisoning/.gitea/workflows/build.yml \
-  "$SEED_WORKTREE/.gitea/workflows/build.yml"
+cp "$project_root/demo/scenarios/build-poisoning/.gitea/workflows/build.yml" \
+  .gitea/workflows/build.yml
 
-seed_git diff -- .gitea/workflows/build.yml
+git diff -- .gitea/workflows/build.yml
 ```
 
 Point out the additional **Publish build diagnostics** step. It maps the repository secret into the job environment and passes it to `tools/report_canary.py`. No application source has changed.
@@ -34,11 +43,12 @@ Point out the additional **Publish build diagnostics** step. It maps the reposit
 Commit and push the change:
 
 ```bash
-seed_git add .gitea/workflows/build.yml
-seed_git commit -m "demo: expose the pipeline secret [NJ-BUILD-02]"
-auth_header="$(basic_auth_header)"
-seed_git -c "http.extraHeader=Authorization: Basic $auth_header" push origin main
+git add .gitea/workflows/build.yml
+git commit -m "demo: expose the pipeline secret [NJ-BUILD-02]"
+git push origin main
 ```
+
+When Git prompts, use the lab account `demo-admin` and the `GITEA_ADMIN_PASSWORD` value from `$project_root/.env`.
 
 ## Trigger and expected result
 
@@ -66,6 +76,7 @@ Ask: who could change the workflow, was independent review required, why was thi
 ## Reset
 
 ```bash
+cd "$project_root"
 bash scripts/reset-lab.sh
 ```
 
