@@ -87,6 +87,16 @@ docker compose logs --tail=100 developer
 
 The corrected image starts directly as the non-root `developer` user. Rerun `bash scripts/reset-lab.sh` only after `docker compose exec -T developer true` succeeds.
 
+## Reset reports that the seed worktree is missing
+
+The internal `.runtime/seed-worktree` directory is disposable and is intentionally excluded from Git. The current reset script recreates it from the running Gitea repository automatically. Update the lab project on the VM and rerun:
+
+```bash
+bash scripts/reset-lab.sh
+```
+
+If the automatic clone fails, confirm Gitea is running and reachable at `http://127.0.0.1:3000`, then retry. There is no need to repeat a scenario or manually work inside `.runtime`.
+
 ## Reset receives HTTP 403 while clearing events
 
 The current reset script and receiver use the `X-Lab-Reset-Token` header. If the VM is still running an older production-service image, rebuild and recreate it, then retry reset:

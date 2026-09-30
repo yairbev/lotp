@@ -143,6 +143,11 @@ def main() -> int:
     reset_text = (root / "scripts/reset-lab.sh").read_text(encoding="utf-8")
     if "fetch origin main" not in reset_text or "reset --hard origin/main" not in reset_text:
         errors.append("reset script must synchronize its internal worktree before restoring the baseline")
+    if (
+        "Recreating the internal reset worktree from Gitea" not in reset_text
+        or '"$remote_git_url" "$SEED_WORKTREE"' not in reset_text
+    ):
+        errors.append("reset script must recreate a missing internal worktree from Gitea")
 
     gitignore_text = (root / ".gitignore").read_text(encoding="utf-8")
     for expected in [

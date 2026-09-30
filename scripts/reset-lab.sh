@@ -11,11 +11,24 @@ require_command git
 require_command curl
 require_command base64
 
-[[ -d "$SEED_WORKTREE/.git" ]] || fail "Seed worktree not found. Run scripts/start-lab.sh first."
 assert_runtime_target "$SEED_WORKTREE"
+auth_header="$(basic_auth_header)"
+remote_git_url="http://127.0.0.1:3000/$GITEA_ADMIN_USER/nightjar.git"
+
+if ! seed_git rev-parse --git-dir >/dev/null 2>&1; then
+  info "Recreating the internal reset worktree from Gitea"
+  rm -rf -- "$SEED_WORKTREE"
+  if ! git_cmd -c "http.extraHeader=Authorization: Basic $auth_header" clone \
+    "$remote_git_url" "$SEED_WORKTREE"; then
+    fail "Could not clone the nightjar repository from Gitea. Confirm the lab is running, then retry."
+  fi
+fi
+
+seed_git config --local user.name "Nightjar Demo Developer"
+seed_git config --local user.email "developer@example.invalid"
+seed_git remote set-url origin "$remote_git_url"
 
 info "Synchronizing the internal reset worktree with Gitea"
-auth_header="$(basic_auth_header)"
 seed_git -c "http.extraHeader=Authorization: Basic $auth_header" fetch origin main
 seed_git reset --hard origin/main >/dev/null
 seed_git clean -fdx >/dev/null
