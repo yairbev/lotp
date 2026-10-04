@@ -1,6 +1,6 @@
 # Scenario 2: contaminated application
 
-This advanced scenario shows one deployed application change producing two effects: copying the clearly labelled demo login and reading the lab-only values available to the application process.
+This advanced scenario shows one deployed application change producing two effects at different moments: reading the lab-only values available to the application as soon as it starts, and copying the clearly labelled demo credentials when a user signs in.
 
 ## Clean starting state
 
@@ -30,7 +30,7 @@ cp "$project_root/demo/scenarios/application-contamination/app/main.py" \
 git diff -- app/main.py
 ```
 
-The added login-handler logic posts two structured events to the local receiver. It is disabled during the pipeline tests and becomes active only when the code is running as a deployed release.
+The added application-lifespan logic reports the designated application secrets once when the contaminated release starts. Separate login-handler logic reports the submitted demo credentials only when someone signs in. Both behaviors are disabled during pipeline tests and become active only when the code is running as a deployed release.
 
 Commit and push:
 
@@ -42,25 +42,35 @@ git push origin main
 
 When Git prompts, use the lab account `demo-admin` and the `GITEA_ADMIN_PASSWORD` value from `$project_root/.env`.
 
-## Trigger and expected result
+## Deployment trigger and expected result
 
-Wait for the Actions run to complete. Refresh the portal until its release panel shows the new commit, then sign in with the credentials printed on the page:
+Wait for the Actions run to complete and refresh the portal until its release panel shows the new commit. Before signing in, refresh the event viewer. It should already contain one event:
+
+- `application-secrets` with the lab-only JWT, database, and key-canary values.
+
+This event is produced when the contaminated application process starts; it does not require user activity.
+
+## Login trigger and expected result
+
+Sign in with the credentials printed on the page:
 
 ```text
 demo.user / DemoPortal-Only-2026!
 ```
 
-The login should still succeed. Refresh the event viewer. It should contain two events for the same deployed commit:
+The login should still succeed. Refresh the event viewer. It should now contain a second event for the same deployed commit:
 
-1. `login-capture` with the submitted demo username and password.
-2. `application-secrets` with the lab-only JWT, database, and key-canary values.
+- `login-capture` with the submitted demo username and password.
+
+The final view should show both events: application access exercised at process startup, followed by user credentials captured during login.
 
 ## Evidence to inspect
 
 - The source change and commit in Gitea.
 - The successful tests, artifact creation, and deployment run.
 - The portal’s commit, run ID, artifact fingerprint, and deployment time.
-- Both receiver events and their matching commit and run ID.
+- The application-secrets event appearing before any login.
+- The later login-capture event and the matching commit and run ID on both events.
 - Production-service logs if an expected event is missing:
 
   ```bash

