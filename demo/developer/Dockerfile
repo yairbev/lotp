@@ -4,7 +4,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates curl git tini \
+    && apt-get install -y --no-install-recommends ca-certificates curl git tini vim \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --create-home --uid 10002 --shell /bin/bash developer \
     && install -d -o developer -g developer /home/developer/work

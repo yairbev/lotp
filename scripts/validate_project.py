@@ -17,6 +17,7 @@ REQUIRED = [
     ".dockerignore",
     ".env.example",
     "config/runner-config.yaml",
+    "docker/gitea/Dockerfile",
     "docker/runner/Dockerfile",
     "demo/developer/Dockerfile",
     "demo/prod/Dockerfile",
@@ -169,6 +170,7 @@ def main() -> int:
     dockerignore_text = (root / ".dockerignore").read_text(encoding="utf-8")
     for expected in [
         "**",
+        "!docker/gitea/Dockerfile",
         "!docker/runner/Dockerfile",
         "!demo/developer/entrypoint.sh",
         "!demo/prod/collector.py",
@@ -178,6 +180,16 @@ def main() -> int:
     ]:
         if expected not in dockerignore_text:
             errors.append(f".dockerignore is missing build-context rule {expected!r}")
+
+    dockerfiles = [
+        root / "docker/gitea/Dockerfile",
+        root / "docker/runner/Dockerfile",
+        root / "demo/prod/Dockerfile",
+        root / "demo/developer/Dockerfile",
+    ]
+    for dockerfile in dockerfiles:
+        if dockerfile.exists() and "vim" not in dockerfile.read_text(encoding="utf-8"):
+            errors.append(f"vim is missing from container image: {dockerfile.relative_to(root)}")
 
     forbidden_public_paths = ["DummyFileShare", "dummy_file_share"]
     for name in forbidden_public_paths:

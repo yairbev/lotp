@@ -1,8 +1,10 @@
 # Docker builds use the project root as their context. Start by excluding
-# everything, then admit only files copied by the three lab Dockerfiles.
+# everything, then admit only files copied by the four lab Dockerfiles.
 **
 
 !docker/
+!docker/gitea/
+!docker/gitea/Dockerfile
 !docker/runner/
 !docker/runner/Dockerfile
 

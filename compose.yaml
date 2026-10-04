@@ -2,7 +2,11 @@ name: living-off-pipeline
 
 services:
   gitea:
-    image: docker.io/gitea/gitea:${GITEA_VERSION:-1.26.4}-rootless
+    build:
+      context: .
+      dockerfile: docker/gitea/Dockerfile
+      args:
+        GITEA_VERSION: ${GITEA_VERSION:-1.26.4}
     container_name: lotp-gitea
     restart: unless-stopped
     environment:

@@ -125,8 +125,7 @@ fi
 
 if (( BUILD_IMAGES == 1 )); then
   info "Pulling base images and building local images"
-  compose pull gitea
-  compose build runner prod-app developer
+  compose build --pull gitea runner prod-app developer
 fi
 
 info "Preflight checks passed"
