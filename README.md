@@ -103,7 +103,7 @@ slides/                         Current PowerPoint presentation
 
 The repository is intentionally limited to the runnable lab, its attendee documentation, and the current presentation deck:
 
-- [Living-Off-the-Pipeline-Light-Editorial-Draft-03.pptx](slides/Living-Off-the-Pipeline-Light-Editorial-Draft-03.pptx) is the current deck.
+- [Living-Off-the-Pipeline-Light-Editorial-Draft-04.pptx](slides/Living-Off-the-Pipeline-Light-Editorial-Draft-04.pptx) is the current deck.
 - `.env.example` contains only labelled demo values. The generated `.env`, runtime worktree, events, deployment records, and private key formats are ignored.
 - Plans, slide source, speaker-note drafts, templates, visual assets already embedded in the deck, render directories, validation reports, and superseded presentations remain local.
 - Future PoC videos may be placed under `recordings/`. GitHub rejects individual files over 100 MB, so larger recordings should be attached to a GitHub Release instead.

@@ -159,7 +159,7 @@ def main() -> int:
         "!/docker/",
         "!/scripts/",
         "!/walkthroughs/",
-        "!/slides/Living-Off-the-Pipeline-Light-Editorial-Draft-03.pptx",
+        "!/slides/Living-Off-the-Pipeline-Light-Editorial-Draft-04.pptx",
         "!/recordings/*.mp4",
         "/DummyFileShare/",
         "/build_dummy_file_share.py",
