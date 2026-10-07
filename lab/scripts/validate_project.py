@@ -8,13 +8,9 @@ from pathlib import Path
 
 REQUIRED = [
     "README.md",
-    "PLAN.md",
     "WALKTHROUGH.md",
-    ".gitignore",
     ".dockerignore",
-    ".gitattributes",
     "compose.yaml",
-    ".dockerignore",
     ".env.example",
     "config/runner-config.yaml",
     "docker/gitea/Dockerfile",
@@ -51,6 +47,7 @@ FORBIDDEN_CAPABILITIES = [
 
 def main() -> int:
     root = Path(sys.argv[1] if len(sys.argv) > 1 else ".").resolve()
+    repository_root = root.parent
     errors: list[str] = []
 
     for relative in REQUIRED:
@@ -150,19 +147,28 @@ def main() -> int:
     ):
         errors.append("reset script must recreate a missing internal worktree from Gitea")
 
-    gitignore_text = (root / ".gitignore").read_text(encoding="utf-8")
+    presentation = repository_root / "presentation" / "Living-Off-the-Pipeline.pptx"
+    if not presentation.is_file():
+        errors.append("missing approved presentation: presentation/Living-Off-the-Pipeline.pptx")
+
+    recordings = repository_root / "presentation" / "recordings"
+    for scenario in range(1, 4):
+        recording = recordings / f"lotp_scenario_{scenario}.mp4"
+        if not recording.is_file():
+            errors.append(f"missing fallback recording: {recording.relative_to(repository_root)}")
+
+    gitignore_path = repository_root / ".gitignore"
+    gitignore_text = gitignore_path.read_text(encoding="utf-8") if gitignore_path.is_file() else ""
+    if not gitignore_text:
+        errors.append("missing repository .gitignore")
     for expected in [
         "/*",
-        "!/.env.example",
-        "!/compose.yaml",
-        "!/demo/",
-        "!/docker/",
-        "!/scripts/",
-        "!/walkthroughs/",
-        "!/slides/Living-Off-the-Pipeline-Light-Editorial-Draft-04.pptx",
-        "!/recordings/*.mp4",
-        "/DummyFileShare/",
-        "/build_dummy_file_share.py",
+        "!/lab/",
+        "!/lab/.env.example",
+        "!/presentation/Living-Off-the-Pipeline.pptx",
+        "!/presentation/recordings/*.mp4",
+        "**/DummyFileShare/",
+        "**/build_dummy_file_share.py",
     ]:
         if expected not in gitignore_text:
             errors.append(f".gitignore is missing publication guard {expected!r}")
@@ -193,9 +199,10 @@ def main() -> int:
 
     forbidden_public_paths = ["DummyFileShare", "dummy_file_share"]
     for name in forbidden_public_paths:
-        if (root / name).exists():
-            errors.append(f"unrelated dummy file-share path remains: {name}")
-    for path in root.rglob("build_dummy_file_share.py"):
+        for path in repository_root.rglob(name):
+            if path.is_dir():
+                errors.append(f"unrelated dummy file-share path remains: {path.relative_to(repository_root)}")
+    for path in repository_root.rglob("build_dummy_file_share.py"):
         if path.is_file():
             errors.append(f"unrelated dummy file-share generator remains: {path.relative_to(root)}")
 

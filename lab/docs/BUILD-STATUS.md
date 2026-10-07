@@ -36,21 +36,21 @@ Status updated on 2026-09-29.
 - Repository restoration reached Gitea after correcting command-scoped Git safe-directory handling.
 - Event clearing succeeded after aligning the reset-request header.
 
-## Implemented corrections awaiting combined revalidation
+## Final corrections verified
 
-- The developer image now starts directly as the non-root `developer` user and no longer attempts a forbidden ownership change under `cap_drop: ALL`.
-- Reset now fails clearly if the developer container is unavailable instead of reporting a successful complete reset.
-- The current walkthrough replacement files use port 9000, the deployed workflow, raw lab-only values, and the named developer canary.
+- The developer image starts directly as the non-root `developer` user and no longer attempts a forbidden ownership change under `cap_drop: ALL`.
+- Reset fails clearly if the developer container is unavailable instead of reporting a successful complete reset.
+- The walkthrough replacement files use port 9000, the deployed workflow, raw lab-only values, and the named developer canary.
 
-## Current validation gate
+## Scenario validation
 
-The three walkthroughs are written but have not yet been accepted as fully repeatable by the presenter. Validate them in order from [WALKTHROUGH.md](../WALKTHROUGH.md):
+The presenter completed all three walkthroughs successfully in order from [WALKTHROUGH.md](../WALKTHROUGH.md):
 
 1. Pipeline secret exposure.
 2. Contaminated application.
 3. Developer-task contamination.
 
-For each scenario, confirm the documented change, trigger, event values, evidence links, and clean reset. Record only after that scenario passes on the presentation VM.
+Each scenario produced its documented result, and the fallback recordings are stored under `presentation/recordings/` at the repository root.
 
 If a scenario fails, capture this output before changing or purging anything:
 
@@ -61,10 +61,8 @@ curl -fsS http://127.0.0.1:8000/api/release
 curl -fsS http://127.0.0.1:9000/api/events
 ```
 
-## Remaining milestones
+## Packaged artifacts
 
-- Presenter validation of all three walkthroughs and reset paths.
-- Three recordings, including the live-demo fallback.
-- Deck revision using the validated screens and recordings.
-- Final packaging test on a clean Linux machine.
-- Full-session timing and fallback rehearsal.
+- Approved deck: `presentation/Living-Off-the-Pipeline.pptx` at the repository root.
+- Scenario recordings: `presentation/recordings/` at the repository root.
+- Runnable lab: the current `lab/` directory.

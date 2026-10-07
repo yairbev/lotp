@@ -1,56 +1,32 @@
 # Public repository allowlist
 #
-# Ignore every top-level item first. The exceptions below are the complete
-# public package: one presentation, the runnable lab, and its attendee guides.
+# The published repository contains one approved presentation and the runnable
+# lab. Everything else at the repository root remains excluded by default.
 /*
 
-# Repository and lab entry points
-!/.dockerignore
-!/.env.example
+# Repository files
 !/.gitattributes
 !/.gitignore
 !/README.md
-!/WALKTHROUGH.md
-!/compose.yaml
 
-# Runnable lab implementation
-!/config/
-!/demo/
-!/docker/
-!/scripts/
-!/walkthroughs/
+# Approved presentation and fallback recordings
+!/presentation/
+/presentation/*
+!/presentation/Living-Off-the-Pipeline.pptx
+!/presentation/recordings/
+/presentation/recordings/*
+!/presentation/recordings/*.mp4
+!/presentation/recordings/*.webm
+!/presentation/recordings/*.mov
+!/presentation/recordings/*.mkv
 
-# Defensive material that accompanies the lab
-!/observability/
+# Runnable lab and attendee documentation
+!/lab/
 
-# Publish only lab-facing documentation
-!/docs/
-/docs/*
-!/docs/ARCHITECTURE.md
-!/docs/BUILD-STATUS.md
-!/docs/DEMO-RUNBOOK.md
-!/docs/SAFETY.md
-!/docs/SOURCES.md
-!/docs/TROUBLESHOOTING.md
-
-# Publish only the current presentation
-!/slides/
-/slides/*
-!/slides/Living-Off-the-Pipeline-Light-Editorial-Draft-04.pptx
-
-# Optional future PoC recordings; keep supporting build material excluded
-!/recordings/
-/recordings/*
-!/recordings/*.mp4
-!/recordings/*.webm
-!/recordings/*.mov
-!/recordings/*.mkv
-
-# Never publish generated state, caches, secrets, or private key material,
-# including files created below an allowed lab directory.
+# Never publish generated state, caches, secrets, or private key material.
 **/.env
 **/.env.*
-!/.env.example
+!/lab/.env.example
 **/.runtime/
 **/__pycache__/
 **/*.py[cod]
@@ -86,6 +62,6 @@
 **/Desktop.ini
 
 # Explicit guard for the unrelated dummy SMB file-share project
-/DummyFileShare/
-/dummy_file_share/
-/build_dummy_file_share.py
+**/DummyFileShare/
+**/dummy_file_share/
+**/build_dummy_file_share.py
