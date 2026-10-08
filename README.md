@@ -21,5 +21,3 @@ lab/
   scripts/                       Start, reset, status, and stop commands
   walkthroughs/                  Scenario instructions
 ```
-
-Open the [approved presentation](presentation/Living-Off-the-Pipeline.pptx), or continue with the [lab setup](lab/README.md).

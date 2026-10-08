@@ -4,7 +4,7 @@ This runbook covers environment readiness and the normal automated deployment. U
 
 ## First deployment
 
-From the copied project directory on the Ubuntu VM:
+From the repository's `lab` directory on the Ubuntu VM:
 
 ```bash
 chmod +x scripts/*.sh
@@ -58,6 +58,6 @@ bash scripts/start-lab.sh
 
 The preserved restart should return the same repository and deployment state. Use `bash scripts/stop-lab.sh --purge` only when you intentionally want a completely fresh lab; it deletes the named volumes and `.runtime` worktree.
 
-## Scenario and recording preparation
+## Scenario and fallback preparation
 
-Complete all three walkthroughs from a reset baseline before recording. The compatible replacement files under `demo/scenarios/` are applied manually by the walkthroughs; no script performs a scenario. Record only after the expected evidence and reset behavior have both succeeded on the presentation VM.
+Complete all three walkthroughs from a reset baseline before the presentation. The compatible replacement files under `demo/scenarios/` are applied manually by the walkthroughs; no script performs a scenario. The recordings under `../presentation/recordings/` are fallbacks if a live demonstration cannot continue.

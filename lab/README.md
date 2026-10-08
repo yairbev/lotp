@@ -2,7 +2,7 @@
 
 Presenter-led security briefing and a local CI/CD lab for showing how trusted development automation can carry an attacker-controlled change.
 
-The clean baseline is running on the Ubuntu VM: Gitea accepts a source change, a Gitea runner tests and packages it, and the production service deploys the resulting release. Three manual scenario walkthroughs and their readable replacement files are included for presenter validation before recording.
+The clean baseline runs on the Ubuntu VM: Gitea accepts a source change, a Gitea runner tests and packages it, and the production service deploys the resulting release. Three manual scenario walkthroughs and their readable replacement files support live delivery, repeatable testing, and the included fallback recordings.
 
 ## Lab shape
 

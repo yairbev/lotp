@@ -6,7 +6,7 @@ This is the entry point for reproducing the three presentation scenarios on the 
 
 Use only the lab values and services supplied by this project. Do not place company credentials, source code, tokens, or host data in the VM. Read [docs/SAFETY.md](docs/SAFETY.md) before changing a scenario.
 
-From the project root, confirm the clean lab is available:
+From the repository's `lab` directory, confirm the clean lab is available:
 
 ```bash
 bash scripts/start-lab.sh
@@ -48,8 +48,8 @@ git pull --ff-only origin main
 ## Recommended order
 
 1. [Pipeline secret exposure](walkthroughs/01-pipeline-secret-exposure.md) — main live demonstration.
-2. [Contaminated application](walkthroughs/02-contaminated-application.md) — advanced recorded scenario.
-3. [Developer-task contamination](walkthroughs/03-developer-task-contamination.md) — advanced recorded scenario.
+2. [Contaminated application](walkthroughs/02-contaminated-application.md) — additional live demonstration.
+3. [Developer-task contamination](walkthroughs/03-developer-task-contamination.md) — additional live demonstration.
 
 Run the reset command before every scenario, including the first:
 
@@ -61,6 +61,6 @@ The reset restores tracked repository files, clears event records, and refreshes
 
 ## Validation status
 
-The Ubuntu VM has exercised repository seeding, Gitea login, Actions execution, deployment, portal access, and event-receiver access. Reset and developer-container corrections are included in the current files and will be rechecked while validating these walkthroughs. Record a scenario only after its expected result and reset have both succeeded on that VM.
+The Ubuntu VM has exercised repository seeding, Gitea login, Actions execution, deployment, portal access, event-receiver access, and all three scenarios. The current files include the reset and developer-container corrections. Recheck the full sequence after a fresh deployment before presenting it.
 
 Use [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) if the observed state differs from a walkthrough.
