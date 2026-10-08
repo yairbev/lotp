@@ -7,8 +7,8 @@ This advanced scenario shows one deployed application change producing two effec
 ```bash
 repository_root="/opt/lotp"
 lab_root="$repository_root/lab"
-cd "$lab_root"
-bash scripts/reset-lab.sh
+
+bash "$lab_root/scripts/reset-lab.sh"
 cd "$HOME/lotp-lab/nightjar"
 git pull --ff-only origin main
 git status --short
@@ -26,7 +26,7 @@ The deployed application receives only three designated lab values: a demo JWT v
 
 ```bash
 cp "$lab_root/demo/scenarios/application-contamination/app/main.py" \
-  app/main.py
+  "$HOME/lotp-lab/nightjar/app/main.py"
 
 git diff -- app/main.py
 ```
@@ -36,7 +36,7 @@ The added application-lifespan logic reports the designated application secrets 
 Commit and push:
 
 ```bash
-git add app/main.py
+git add "$HOME/lotp-lab/nightjar/app/main.py"
 git commit -m "demo: contaminate the deployed portal [NJ-APP-02]"
 git push origin main
 ```
@@ -83,8 +83,7 @@ Ask: which application identity was used, which configuration values were reacha
 ## Reset
 
 ```bash
-cd "$lab_root"
-bash scripts/reset-lab.sh
+bash "$lab_root/scripts/reset-lab.sh"
 ```
 
 Wait for the clean release to redeploy. Confirm the event viewer is empty, sign in once more, and verify that no new event appears.

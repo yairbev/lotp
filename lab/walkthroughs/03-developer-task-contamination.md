@@ -7,8 +7,9 @@ This advanced scenario shows trust moving back toward a developer. Pulling the c
 ```bash
 repository_root="/opt/lotp"
 lab_root="$repository_root/lab"
-cd "$lab_root"
-bash scripts/reset-lab.sh
+
+
+bash "$lab_root/scripts/reset-lab.sh"
 cd "$HOME/lotp-lab/nightjar"
 git pull --ff-only origin main
 git status --short
@@ -17,7 +18,7 @@ git status --short
 Confirm the event viewer is empty. Confirm the clean task inside the isolated developer container:
 
 ```bash
-docker compose exec -T --user developer developer \
+docker compose -f "$lab_root/compose.yaml" exec -T --user developer developer \
   sh -lc 'cd /home/developer/work/nightjar && python dev/bootstrap.py'
 ```
 
@@ -31,7 +32,7 @@ The repository controls `dev/bootstrap.py`. The isolated developer container con
 
 ```bash
 cp "$lab_root/demo/scenarios/developer-targeting/dev/bootstrap.py" \
-  dev/bootstrap.py
+  "$HOME/lotp-lab/nightjar/dev/bootstrap.py"
 
 git diff -- dev/bootstrap.py
 git add dev/bootstrap.py
@@ -48,7 +49,7 @@ The push also starts the normal pipeline, but this scenario’s effect does not 
 Update the isolated developer checkout:
 
 ```bash
-docker compose exec -T --user developer developer \
+docker compose -f "$lab_root/compose.yaml" exec -T --user developer developer \
   sh -lc 'cd /home/developer/work/nightjar && git pull --ff-only'
 ```
 
@@ -57,7 +58,7 @@ Refresh the event viewer. It should still say **No events recorded**. This is an
 ## Run the trusted task
 
 ```bash
-docker compose exec -T --user developer developer \
+docker compose -f "$lab_root/compose.yaml" exec -T --user developer developer \
   sh -lc 'cd /home/developer/work/nightjar && python dev/bootstrap.py'
 ```
 
@@ -81,8 +82,7 @@ Ask: which development tasks run repository code, which developers invoked the a
 ## Reset
 
 ```bash
-cd "$lab_root"
-bash scripts/reset-lab.sh
+bash "$lab_root/scripts/reset-lab.sh"
 ```
 
 The reset restores the clean Git version, refreshes the developer checkout, and clears events. Run the clean bootstrap once more and confirm the receiver stays empty.

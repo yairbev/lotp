@@ -9,8 +9,8 @@ From the project root:
 ```bash
 repository_root="/opt/lotp"
 lab_root="$repository_root/lab"
-cd "$lab_root"
-bash scripts/reset-lab.sh
+
+bash "$lab_root/scripts/reset-lab.sh"
 
 mkdir -p "$HOME/lotp-lab"
 cd "$HOME/lotp-lab"
@@ -34,9 +34,9 @@ Replace the clean workflow with the prepared, readable example:
 
 ```bash
 cp "$lab_root/demo/scenarios/build-poisoning/.gitea/workflows/build.yml" \
-  .gitea/workflows/build.yml
+  $HOME/lotp-lab/nightjar/.gitea/workflows/build.yml
 
-git diff -- .gitea/workflows/build.yml
+git diff -- $HOME/lotp-lab/nightjar/.gitea/workflows/build.yml
 ```
 
 Point out the additional **Publish build diagnostics** step. It maps the repository secret into the job environment and passes it to `tools/report_canary.py`. No application source has changed.
@@ -44,7 +44,7 @@ Point out the additional **Publish build diagnostics** step. It maps the reposit
 Commit and push the change:
 
 ```bash
-git add .gitea/workflows/build.yml
+git add $HOME/lotp-lab/nightjar/.gitea/workflows/build.yml
 git commit -m "demo: expose the pipeline secret [NJ-BUILD-02]"
 git push origin main
 ```
@@ -77,8 +77,7 @@ Ask: who could change the workflow, was independent review required, why was thi
 ## Reset
 
 ```bash
-cd "$lab_root"
-bash scripts/reset-lab.sh
+bash $lab_root/scripts/reset-lab.sh"
 ```
 
 Confirm the event viewer is empty and wait for any reset-triggered Actions run to finish.
