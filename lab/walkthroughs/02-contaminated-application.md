@@ -5,8 +5,9 @@ This advanced scenario shows one deployed application change producing two effec
 ## Clean starting state
 
 ```bash
-project_root="/opt/lotp"
-cd "$project_root"
+repository_root="/opt/lotp"
+lab_root="$repository_root/lab"
+cd "$lab_root"
 bash scripts/reset-lab.sh
 cd "$HOME/lotp-lab/nightjar"
 git pull --ff-only origin main
@@ -24,7 +25,7 @@ The deployed application receives only three designated lab values: a demo JWT v
 ## Make and inspect the change
 
 ```bash
-cp "$project_root/demo/scenarios/application-contamination/app/main.py" \
+cp "$lab_root/demo/scenarios/application-contamination/app/main.py" \
   app/main.py
 
 git diff -- app/main.py
@@ -40,7 +41,7 @@ git commit -m "demo: contaminate the deployed portal [NJ-APP-02]"
 git push origin main
 ```
 
-When Git prompts, use the lab account `demo-admin` and the `GITEA_ADMIN_PASSWORD` value from `$project_root/.env`.
+When Git prompts, use the lab account `demo-admin` and the `GITEA_ADMIN_PASSWORD` value from `$lab_root/.env`.
 
 ## Deployment trigger and expected result
 
@@ -82,7 +83,7 @@ Ask: which application identity was used, which configuration values were reacha
 ## Reset
 
 ```bash
-cd "$project_root"
+cd "$lab_root"
 bash scripts/reset-lab.sh
 ```
 

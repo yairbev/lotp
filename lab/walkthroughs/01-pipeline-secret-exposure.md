@@ -7,8 +7,9 @@ This is the main live demonstration. It shows a repository workflow change causi
 From the project root:
 
 ```bash
-project_root="/opt/lotp"
-cd "$project_root"
+repository_root="/opt/lotp"
+lab_root="$repository_root/lab"
+cd "$lab_root"
 bash scripts/reset-lab.sh
 
 mkdir -p "$HOME/lotp-lab"
@@ -32,7 +33,7 @@ The repository controls the workflow instruction. Gitea supplies `DEMO_BUILD_SEC
 Replace the clean workflow with the prepared, readable example:
 
 ```bash
-cp "$project_root/demo/scenarios/build-poisoning/.gitea/workflows/build.yml" \
+cp "$lab_root/demo/scenarios/build-poisoning/.gitea/workflows/build.yml" \
   .gitea/workflows/build.yml
 
 git diff -- .gitea/workflows/build.yml
@@ -48,7 +49,7 @@ git commit -m "demo: expose the pipeline secret [NJ-BUILD-02]"
 git push origin main
 ```
 
-When Git prompts, use the lab account `demo-admin` and the `GITEA_ADMIN_PASSWORD` value from `$project_root/.env`.
+When Git prompts, use the lab account `demo-admin` and the `GITEA_ADMIN_PASSWORD` value from `$lab_root/.env`.
 
 ## Trigger and expected result
 
@@ -76,7 +77,7 @@ Ask: who could change the workflow, was independent review required, why was thi
 ## Reset
 
 ```bash
-cd "$project_root"
+cd "$lab_root"
 bash scripts/reset-lab.sh
 ```
 

@@ -36,7 +36,7 @@ git config user.name "Nightjar Demo Developer"
 git config user.email "developer@example.invalid"
 ```
 
-All scenario changes, commits, and pushes are performed from `$HOME/lotp-lab/nightjar` with the normal Git CLI. The scenario examples are copied from `/opt/lotp/demo/scenarios/`; adjust that project path if the lab repository is installed elsewhere.
+All scenario changes, commits, and pushes are performed from `$HOME/lotp-lab/nightjar` with the normal Git CLI. The scenario examples are copied from `/opt/lotp/lab/demo/scenarios/`; adjust the repository path if the project is installed elsewhere.
 
 After `reset-lab.sh` restores Gitea, update the external clone before beginning the next scenario:
 
